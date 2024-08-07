@@ -5,12 +5,12 @@
  */
 module.exports = {
   development: {
-    client: "pq",
+    client: "pg",
     connection: {
       host: "localhost",
       port: 5432,
       user: "postgres",
-      password: "postgres",
+      password: "localhost",
       database: "perpustakaan",
     },
   },
