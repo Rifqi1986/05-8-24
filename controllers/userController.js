@@ -20,20 +20,21 @@ class UserController {
         created_at: new Date(),
         updated_at: new Date(),
       };
-
       console.log(inputUser, "===> THIS FINAL");
-      const insertData = await db("users").insert(inputUser);
+      const insertData = await db("users").insert(inputUser).returning("id");
+      console.log(insertData, "==> Hasil Insert");
+
+      if (insertData.length >= 1) {
+        res.redirect("/login");
+      } else {
+        console.log("masuk ke Tidak Ada Datanya");
+
+        throw new Error("Bad Request");
+      }
 
       console.log(insertData, "==> FINAL TWO");
-      // if (insertData.length >= 1) {
-      //   res.redirect("/login");
-      // } else {
-      //   console.log("masuk ke Tidak Ada Datanya");
-
-      //   throw new Error("Bad Request");
-      // }
     } catch (error) {
-      console.log(error, "===> error 33");
+      console.log(error, "===> This Is Error");
       res.status(500).json(error);
     }
   }
@@ -41,6 +42,27 @@ class UserController {
   static renderLoginPage(req, res) {
     res.render("login");
   }
-}
 
+  static async handleLogin(req, res) {
+    try {
+      const { nameuser, password } = req.body;
+      const dataUser = await db("users").where({ username: nameuser }).first(); // ini untuk cek username ada atau tidak
+
+      console.log(dataUser);
+
+      if (dataUser) {
+        const passwordMatch = bcrypt.compareSync(password, dataUser.password);
+        console.log(passwordMatch);
+
+        if (passwordMatch) {
+          res.redirect("/home");
+        } else {
+          res.redirect("/login");
+        }
+      } else {
+        console.log("Password/email is wrong");
+      }
+    } catch (error) {}
+  }
+}
 module.exports = UserController;
