@@ -3,7 +3,7 @@ const db = require("../lib/db");
 
 class UserController {
   static renderRegisterPage(req, res) {
-    res.render("register");
+        res.render("register");
   }
 
   static async handleRegisterPage(req, res) {
@@ -28,19 +28,27 @@ class UserController {
         res.redirect("/login");
       } else {
         console.log("masuk ke Tidak Ada Datanya");
-
+        
         throw new Error("Bad Request");
       }
-
+      
       console.log(insertData, "==> FINAL TWO");
     } catch (error) {
       console.log(error, "===> This Is Error");
       res.status(500).json(error);
     }
   }
-
+  
   static renderLoginPage(req, res) {
-    res.render("login");
+    let message = ""
+    
+    if(req.session) {
+      if(req.session.message) {
+        message = req.session.message[0]
+        req.session.message = null // ini harus di reassign dengan falsy lagi
+      }
+    }
+    res.render("login", {data: message})
   }
 
   static async handleLogin(req, res) {
